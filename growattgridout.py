@@ -1,4 +1,3 @@
-name = "growattServer"
 
 import datetime
 from enum import IntEnum
@@ -603,6 +602,7 @@ class GrowattApi:
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--config", help="path to config file")
 args = parser.parse_args()
+name = "growattServer"
 
 if args.config:
     with open(args.config) as f:
@@ -615,7 +615,7 @@ if args.config:
         ip_address = config['ip_address']
 
 # Initialize power values
-power_values = [0, 0, 0, 0]
+power_values = [0, 0]
 
 # Create a Growatt API instance and log in
 api = GrowattApi()
@@ -697,6 +697,4 @@ while True:
 
     # Wait 5 minutes before the next iteration
     time.sleep(5*60)
-
-
 
