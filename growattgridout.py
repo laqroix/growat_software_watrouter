@@ -641,6 +641,9 @@ while True:
 
         # Get current overproduction and add it to power_values
         overproduction = float(mixinfo["pactogrid"])
+        chargepower = float(mixinfo["chargePower"])
+        chargelevel = float(mixinfo["SOC"])
+
         power_values.append(overproduction)
 
         # Predict the next value using power_values
@@ -651,11 +654,12 @@ while True:
             power_values.pop(0)
 
         # If predicted overproduction or overproduction is high, turn on the device and set performance settings
-        if predicted > 0.35 or overproduction > 0.5 and not overproduction < 0.2:
+        if ((predicted > 0.35 or overproduction > 0.5 and not overproduction < 0.2) or
+                (chargelevel > 65 and chargepower > .5)):
             os.system('undervolt --gpu -20 --core -15 --cache -15 --uncore -15 --analogio -15 --temp 95')
             os.system('cpupower frequency-set --governor performance > /dev/null')
 
-            if predicted > 0.5 and not turned_on:
+            if not turned_on and (predicted > 0.5 or (chargelevel > 75 and chargepower > .75)):
                 # Turn on the device and handle any errors
                 ret = device.turn_on()
                 if "Error" in ret:
@@ -670,7 +674,7 @@ while True:
             os.system('undervolt --gpu -20 --core -15 --cache -15 --uncore -15 --analogio -15 --temp 70')
             os.system('cpupower frequency-set --governor powersave > /dev/null')
 
-            if (predicted < 0.2 or overproduction < 0.2) and turned_on:
+            if turned_on and (predicted < 0.2 or overproduction < 0.2 or (chargelevel < 75 and chargepower < .5)):
                 # Turn off the device and handle any errors
                 ret = device.turn_off()
                 if "Error" in ret:
