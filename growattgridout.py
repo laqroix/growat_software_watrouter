@@ -91,6 +91,7 @@ print(device.turn_off())
 while True:
     try:
         ret = ''
+
         # Get plant information and ID
         plant_info = api.plant_list(login_response['user']['id'])
         plant_id = plant_info["data"][0]["plantId"]
@@ -113,8 +114,7 @@ while True:
             power_values.pop(0)
 
         # If predicted overproduction or overproduction is high, turn on the device and set performance settings
-        if ((predicted > 0.35 or overproduction > 0.5 and not overproduction < 0.2) or
-                (chargelevel > 65 and chargepower > .5)):
+        if (predicted > 0.5 or overproduction > 0.5 or (chargelevel > 65 and chargepower > .5)):
             os.system('undervolt --gpu -20 --core -15 --cache -15 --uncore -15 --analogio -15 --temp 95')
             os.system('cpupower frequency-set --governor performance > /dev/null')
 
